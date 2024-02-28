@@ -19,6 +19,7 @@ package com.google.inject.internal;
 import com.google.inject.internal.InjectorImpl.InjectorOptions;
 import com.google.inject.spi.Dependency;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Internal context. Used to coordinate injections and support circular dependencies.
@@ -29,8 +30,7 @@ final class InternalContext implements AutoCloseable {
 
   private final InjectorOptions options;
 
-  private final IdentityHashMap<Object, ConstructionContext<?>> constructionContexts =
-      new IdentityHashMap<>();
+  private Map<Object, ConstructionContext<?>> constructionContexts;
 
   /** Keeps track of the type that is currently being requested for injection. */
   private Dependency<?> dependency;
@@ -77,6 +77,10 @@ final class InternalContext implements AutoCloseable {
 
   @SuppressWarnings("unchecked")
   <T> ConstructionContext<T> getConstructionContext(Object key) {
+    if(constructionContexts == null) {
+      constructionContexts = new IdentityHashMap<>();
+    }
+
     ConstructionContext<T> constructionContext =
         (ConstructionContext<T>) constructionContexts.get(key);
     if (constructionContext == null) {
