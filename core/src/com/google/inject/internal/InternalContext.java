@@ -37,7 +37,7 @@ final class InternalContext implements AutoCloseable {
 
   /**
    * The number of times {@link #enter()} has been called + 1 for initial construction. This value
-   * is decremented when {@link #exit()} is called.
+   * is decremented when {@link #close()}} is called.
    */
   private int enterCount;
 
@@ -80,14 +80,7 @@ final class InternalContext implements AutoCloseable {
     if(constructionContexts == null) {
       constructionContexts = new IdentityHashMap<>();
     }
-
-    ConstructionContext<T> constructionContext =
-        (ConstructionContext<T>) constructionContexts.get(key);
-    if (constructionContext == null) {
-      constructionContext = new ConstructionContext<>();
-      constructionContexts.put(key, constructionContext);
-    }
-    return constructionContext;
+    return (ConstructionContext<T>)constructionContexts.computeIfAbsent(key, k -> new ConstructionContext<>());
   }
 
   Dependency<?> getDependency() {
